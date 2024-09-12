@@ -1,7 +1,9 @@
 import pandas as pd
 import plotly.express as px
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, TruncatedSVD
+from scipy.sparse import csr_matrix
+import numpy as np
 
 mmData = pd.read_csv("mammographic_masses_data.csv")
 
@@ -17,10 +19,8 @@ def normalize(dataColumn):
     return normalized_data
 
 
-
-
-
 ################    End of Functions    ##################
+
 
 # mmData.describe()
 # shows mean, median, standard deviation, minumum value, maximum value, 1st 2nd and 3rd quantile
@@ -72,38 +72,54 @@ X = mmDataN.drop('Severity', axis=1)
 y = mmDataN['Severity']
 
 #Train Random Forest Model
-model = RandomForestClassifier(n_estimators=100)
-model.fit(X, y)
+RFmodel = RandomForestClassifier(n_estimators=100)
+RFmodel.fit(X, y)
 
-importances = model.feature_importances_
+importances = RFmodel.feature_importances_
 
 # Creating a DataFrame to hold the feature importances
 feature_importances = pd.DataFrame(importances, index=X.columns, columns=['Importance'])
 
 # print(feature_importances)
 
-# TreeFig = px.bar(
-#     feature_importances,
-#     x='Importance',
-#     y=feature_importances.index,
-#     title='Feature Importances to predict Severity',
-#     labels={'Importance': 'Importance Score', 'index': 'Features'},
-#     )
+TreeFig = px.bar(
+    feature_importances,
+    x='Importance',
+    y=feature_importances.index,
+    title='Feature Importances to predict Severity',
+    labels={'Importance': 'Importance Score', 'index': 'Features'},
+    )
 
-# TreeFig.show()
+TreeFig.show()
 
 #4.2
 
 #Choose how many components to keep
 pca = PCA(n_components=2)
 
-pcaData = pd.DataFrame(pca.fit_transform(mmDataN), columns = ['PrincipalComponent1','PrincipalComponent2'] )
+pcaData = pca.fit_transform(mmDataN)
 
 PCAfig = px.scatter(
     pcaData,
-    x='PrincipalComponent1',
-    y='PrincipalComponent2',
+    x=0,
+    y=1,
     title='PCA of Features',
+    labels={'0': 'Principal Component 1', '1': 'Principal Component 2'}
 )
 
 PCAfig.show()
+
+#Truncated SVD
+
+svd = TruncatedSVD(n_components=2)
+TSVD = svd.fit_transform(mmDataN)
+
+TSVDfig = px.scatter(
+    TSVD,
+    x=0,
+    y=1,
+    title='Scatter Plot of First Two Principal Components after Truncated SVD',
+    labels={'0': 'Principal Component 1', '1': 'Principal Component 2'}
+)
+
+TSVDfig.show()
