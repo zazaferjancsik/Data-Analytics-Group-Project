@@ -109,17 +109,26 @@ PCAfig = px.scatter(
 
 PCAfig.show()
 
+explained_variance = pca.explained_variance_ratio_
+explained_variance_df = pd.DataFrame({
+    'Component': ['Component 1', 'Component 2'],
+    'Explained Variance': explained_variance
+})
+
+PCAVARfig = px.bar(['Component 1', 'Component 2'], explained_variance, color=0)
+PCAVARfig.show()
+
 #Truncated SVD
 
-svd = TruncatedSVD(n_components=2)
-TSVD = svd.fit_transform(mmDataN)
+# svd = TruncatedSVD(n_components=2)
+# TSVD = svd.fit_transform(mmDataN)
 
-TSVDfig = px.scatter(
-    TSVD,
-    x=0,
-    y=1,
-    title='Scatter Plot of First Two Principal Components after Truncated SVD',
-    labels={'0': 'Principal Component 1', '1': 'Principal Component 2'}
-)
+# TSVDfig = px.scatter(
+#     TSVD,
+#     x=0,
+#     y=1,
+#     title='Scatter Plot of First Two Principal Components after Truncated SVD',
+#     labels={'0': 'Principal Component 1', '1': 'Principal Component 2'}
+# )
 
-TSVDfig.show()
+# TSVDfig.show()
